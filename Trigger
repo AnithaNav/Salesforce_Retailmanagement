@@ -1,1 +1,34 @@
+//validation Trigger, that validate a contact record ,if no account assoiciated with it ,creates  new account with Emailid domain name 
+//ex: dell.com is accountid
 
+trigger Contactcreateacc on Contact (after insert,after update) {
+    if(Trigger.isAfter && trigger.isInsert)
+    {
+        Contactcreacchandler.createacc(trigger.new,null);
+    }
+    else if(Trigger.isAfter && trigger.isUpdate)
+    {
+        Contactcreacchandler.createacc(trigger.new,trigger.oldmap);
+    }
+}
+//Handler class-
+public class Contactcreacchandler {
+    public static void createacc(List<Contact> conList,Map<id,Contact> oldMap)
+ {List<Account> acclist=new List<Account>();
+       if(!conlist.isEmpty())
+    {
+        for(Contact c:conlist){
+      	 { //check if emailid of new contact is not null and old records email is also not null
+             if((c.email!=null && c.accountid==null)|| ((oldmap.get(c.id).email!=c.email)&&(oldmap.get(c.id).accountid==null)))
+     	{ string emafter=c.email.substringAfter('@');
+     	 Account a=new Account();
+     	 a.Name=emafter;
+         a.Phone='123123123';//req field in acc
+         a.Amount__c=12000;//req field in acc
+         acclist.add(a);
+    	 }             
+    }
+    }
+      insert acclist; 
+    }
+  }
